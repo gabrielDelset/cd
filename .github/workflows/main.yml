@@ -57,14 +57,20 @@ jobs:
           path: reports
 
   trivy:
-    runs-on: ubuntu-latest
+    name: trivy
+    runs-on: ubuntu-20.04
     steps:
-      - name: Install Trivy
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Build an image from Dockerfile
         run: |
-          wget https://github.com/aquasecurity/trivy/releases/download/v0.19.1/trivy_0.19.1_Linux-64bit.tar.gz
-          tar zxvf trivy_0.19.1_Linux-64bit.tar.gz
-          sudo mv trivy /usr/local/bin/
-
-      - name: Trivy Scan
-        run: |
-          trivy image gabrield0cker/cd:latest
+          docker build -t docker.io/my-organization/my-app:${{ github.sha }} .
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'docker.io/my-organization/my-app:${{ github.sha }}'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
