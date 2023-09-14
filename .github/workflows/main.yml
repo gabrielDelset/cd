@@ -1,5 +1,3 @@
-Build App
-
 on:
     push:
         branches:
