@@ -30,19 +30,23 @@ jobs:
           env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
             SONAR_TOKEN: "${{ secrets.SONAR_TOKEN }}"
-    Owasp:
-      runs-on: ubuntu-latest
-      steps:
-        - uses: actions/checkout@v2
+    OWASP:
+          runs-on: ubuntu-latest
+          steps:
+          - name: Install Node.js and npm
+            uses: actions/setup-node@v2
+            with: 
+              node-version: '14'
+          - name: Install NPM dependencies
+            run: |
+              npm install
+          - uses: sburris/dependency-check-action@master
+            with:
+              Project-Name: TestApp
+          - name: Archive dependency check reports
+            uses: actions/upload-artifact@v1
+            with:
+              name: reports
+              path: reports
 
-        - name: Install NPM dependencies
-          run: |
-            npm install --production --unsafe-perm
-
-        - name: Upload Artifact
-          uses: actions/upload-artifact@v2
-          with:
-            name: owasp-report
-            path: path/to/your/artifact
-
-            
+                
